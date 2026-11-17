@@ -236,7 +236,7 @@ const featured = (await getRoutes()).filter(({ data }) => data.featured).slice(0
   .contact-copy > p { max-width: 29rem; color: #e0e1d5; }
   .contact-copy :global(.phone-number) { justify-content: center; gap: .9rem; padding: .9rem 1.4rem; text-align: center; }
   .contact-copy :global(.phone-number svg) { width: 1.8rem; height: 1.8rem; flex: none; align-self: center; }
-  .contact-copy :global(.contact-link--prominent) { width: 100%; max-width: 100%; height: 6.4rem; background: var(--accent); color: var(--ink); border-radius: 5rem; }
+  .contact-copy :global(.contact-link--prominent) { width: 100%; max-width: 100%; height: 4.5rem; background: var(--accent); color: var(--ink); border-radius: 5rem; }
   .contact-copy :global(.contact-link--prominent:hover) { background: #ffdbb6; color: var(--ink); }
   .contact-messengers { display: grid; grid-template-columns: minmax(0, 1fr); width: 100%; gap: .65rem; margin-top: .6rem; }
   .contact-messengers :global(.contact-link) { height: 3.2rem; padding-inline: 1.15rem; border: 1px solid #f9f5e880; }
@@ -244,6 +244,7 @@ const featured = (await getRoutes()).filter(({ data }) => data.featured).slice(0
 
   @media (min-width: 52rem) {
     .contact-copy { width: 100%; }
+    .contact-copy :global(.desktop-phone) { align-items: flex-start; padding: 0; text-align: left; }
     .contact-messengers { grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(100%, 22rem); }
   }
 
