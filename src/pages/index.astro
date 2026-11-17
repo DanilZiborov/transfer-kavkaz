@@ -7,6 +7,7 @@ import ContactLink from '../components/ContactLink.astro';
 import Gallery from '../components/Gallery.astro';
 import PhotoGallery from '../components/PhotoGallery.astro';
 import RouteGrid from '../components/RouteGrid.astro';
+import Carousel from '../components/Carousel.astro';
 import { heroPhoto, vehicleGallery } from '../data/photography';
 import { reviews } from '../data/reviews';
 import { site } from '../data/site';
@@ -74,7 +75,7 @@ const featured = (await getRoutes()).filter(({ data }) => data.featured).slice(0
     <div class="section-heading">
       <h2 id="reviews-title">Отзывы</h2>
     </div>
-    <ul class="reviews">
+    <div class="reviews"><Carousel label="Отзывы" variant="reviews">
       {reviews.map((review) => (
         <li>
           <figure>
@@ -87,7 +88,7 @@ const featured = (await getRoutes()).filter(({ data }) => data.featured).slice(0
           </figure>
         </li>
       ))}
-    </ul>
+    </Carousel></div>
   </section>
 
   <div class="gallery-wrap"><Gallery /></div>
@@ -101,7 +102,6 @@ const featured = (await getRoutes()).filter(({ data }) => data.featured).slice(0
       </div>
       <div class="contact-copy">
         <ContactLink channel="phone" showNumber prominent />
-        <p class="copy-status" role="status" aria-live="polite"></p>
         <div class="contact-messengers">
           <ContactLink channel="whatsapp" />
           <ContactLink channel="max" />
@@ -233,12 +233,11 @@ const featured = (await getRoutes()).filter(({ data }) => data.featured).slice(0
   .contact-layout > div > p:not(.eyebrow) { max-width: 31rem; color: #e0e1d5; }
   .contacts .eyebrow { color: var(--accent); }
   .contact-copy > p { max-width: 29rem; color: #e0e1d5; }
-  .contact-copy :global(.phone-number) { justify-content: center; padding: 1.2rem; font-size: clamp(1.4rem, 3vw, 2.15rem); }
+  .contact-copy :global(.phone-number) { justify-content: center; gap: .9rem; padding: .9rem 1.4rem; text-align: center; }
   .contact-copy :global(.phone-number svg) { width: 1.8rem; height: 1.8rem; }
-  .contact-copy :global(.contact-link--prominent) { width: 100%; min-height: 6rem; background: var(--accent); color: var(--ink); border-radius: 1rem; }
+  .contact-copy :global(.contact-link--prominent) { width: fit-content; max-width: 100%; min-height: 4.5rem; background: var(--accent); color: var(--ink); border-radius: 5rem; }
   .contact-copy :global(.contact-link--prominent:hover) { background: #ffdbb6; color: var(--ink); }
-  .copy-status:empty { display: none; }
-  .contact-messengers { display: flex; flex-wrap: wrap; gap: .65rem; margin-block: .3rem; }
+  .contact-messengers { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: min(100%, 22rem); gap: .65rem; margin-top: .6rem; }
   .contact-messengers :global(.contact-link) { min-height: 3.2rem; padding-inline: 1.15rem; border: 1px solid #f9f5e880; }
   .contact-copy :global(.contact-link:not(.contact-link--prominent):hover) { color: var(--accent); }
 
@@ -252,7 +251,7 @@ const featured = (await getRoutes()).filter(({ data }) => data.featured).slice(0
     .hero { align-items: center; }
     .hero-photo { object-position: center 61%; }
     .hero::after { background: linear-gradient(90deg, #162019de, #1620198c 36%, #16201908 72%); }
-    .reviews { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
   }
 
   @media (min-width: 48rem) {

@@ -1,0 +1,91 @@
+---
+import Icon from './Icon.astro';
+interface Props {
+  label: string;
+  variant?: 'directions' | 'reviews';
+}
+const { label, variant = 'directions' } = Astro.props;
+---
+
+<div class:list={['carousel', `carousel--${variant}`]} data-carousel role="region" aria-label={label} aria-roledescription="карусель">
+  <ul class="carousel-track" tabindex="0" aria-label="Листайте стрелками или свайпом"><slot /></ul>
+  <div class="carousel-controls" hidden>
+    <button type="button" class="carousel-arrow" data-prev aria-label={`Предыдущие — ${label}`}><Icon name="left" size={25} /></button>
+    <button type="button" class="carousel-arrow" data-next aria-label={`Следующие — ${label}`}><Icon name="right" size={25} /></button>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-carousel]').forEach((carousel) => {
+    const track = carousel.querySelector<HTMLElement>('.carousel-track');
+    const previous = carousel.querySelector<HTMLButtonElement>('[data-prev]');
+    const next = carousel.querySelector<HTMLButtonElement>('[data-next]');
+    const controls = carousel.querySelector<HTMLElement>('.carousel-controls');
+    if (!track || !previous || !next || !controls) return;
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => {
+      previous.disabled = track.scrollLeft < 2;
+      next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+    };
+    const move = (direction: number) => {
+      const card = track.firstElementChild?.getBoundingClientRect();
+      if (!card) return;
+      const step = card.width + parseFloat(getComputedStyle(track).columnGap);
+      track.scrollBy({ left: step * direction, behavior: motion.matches ? 'instant' : 'smooth' });
+    };
+    previous.addEventListener('click', () => move(-1));
+    next.addEventListener('click', () => move(1));
+    track.addEventListener('keydown', (event) => {
+      if (event.target !== track || !['ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      event.preventDefault();
+      move(event.key === 'ArrowLeft' ? -1 : 1);
+    });
+    track.addEventListener('scroll', update, { passive: true });
+    new ResizeObserver(update).observe(track);
+    controls.hidden = false;
+    update();
+  });
+</script>
+
+<style>
+  .carousel { min-width: 0; }
+  .carousel-track {
+    display: flex;
+    gap: 1rem;
+    overflow-x: auto;
+    margin: 0;
+    padding: .35rem .2rem .85rem;
+    list-style: none;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: .2rem;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+  }
+  .carousel-track::-webkit-scrollbar { display: none; }
+  .carousel-track > :global(li) {
+    flex: 0 0 86%;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+  .carousel-controls { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; }
+  .carousel-controls[hidden] { display: none; }
+  .carousel-arrow {
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    border: 1px solid var(--forest);
+    border-radius: 50%;
+    background: var(--forest);
+    color: var(--paper);
+  }
+  .carousel-arrow:hover { background: #385242; }
+  .carousel-arrow:disabled { opacity: .35; cursor: default; }
+  @media (min-width: 32rem) {
+    .carousel-track > :global(li) { flex-basis: 45%; }
+  }
+  @media (min-width: 66rem) {
+    .carousel--directions .carousel-track > :global(li) { flex-basis: 28%; }
+    .carousel--reviews .carousel-track > :global(li) { flex-basis: 43%; }
+  }
+</style>
