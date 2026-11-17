@@ -5,19 +5,9 @@ import ContactChannels from './ContactChannels.astro';
 <aside class="mobile-contact" aria-label="Быстрая связь">
   <ContactChannels variant="bar" />
 </aside>
-<div class="copy-toast" role="status" aria-live="polite" hidden></div>
 
 <script>
   const mobile = matchMedia('(max-width: 51.999rem)');
-  const toast = document.querySelector<HTMLElement>('.copy-toast');
-  let toastTimer: ReturnType<typeof setTimeout>;
-  const notify = (message: string) => {
-    if (!toast) return;
-    clearTimeout(toastTimer);
-    toast.textContent = message;
-    toast.hidden = false;
-    toastTimer = setTimeout(() => { toast.hidden = true; }, 2000);
-  };
   const links = document.querySelectorAll<HTMLAnchorElement>('[data-contact]');
 
   const updateLinks = () => {
@@ -33,23 +23,9 @@ import ContactChannels from './ContactChannels.astro';
   updateLinks();
   mobile.addEventListener('change', updateLinks);
 
-  links.forEach((link) => {
-    link.addEventListener('click', async (event) => {
-      if (link.dataset.contact !== 'phone' || mobile.matches) return;
-      event.preventDefault();
-      try {
-        await navigator.clipboard.writeText(link.dataset.phone ?? '');
-        notify('Номер скопирован');
-      } catch {
-        notify('Не удалось скопировать номер');
-      }
-    });
-  });
 </script>
 
 <style>
-  .copy-toast { position: fixed; z-index: 20; bottom: calc(var(--bottom-bar) + 1rem); left: 50%; transform: translateX(-50%); max-width: calc(100% - 2rem); padding: .8rem 1.3rem; border-radius: 2rem; background: var(--forest); color: var(--paper); box-shadow: var(--shadow); text-align: center; }
-  .copy-toast[hidden] { display: none; }
   .mobile-contact {
     position: fixed;
     z-index: 5;

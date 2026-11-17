@@ -1,7 +1,7 @@
 ---
 import Icon from './Icon.astro';
 import { localUrl } from '../lib/urls';
-import { contactChannels, contacts, phoneDisplay } from '../data/contacts';
+import { contactChannels, phoneDisplay } from '../data/contacts';
 
 interface Props {
   channel: 'phone' | 'whatsapp' | 'max';
@@ -15,22 +15,32 @@ const contact = contactChannels.find(({ icon }) => icon === channel)!;
 const label = showNumber ? phoneDisplay : contact.label;
 ---
 
+{channel === 'phone' && <span class:list={['desktop-phone', 'phone-number', { 'desktop-phone--prominent': prominent }]}>
+  {prominent && <span class="desktop-phone-label">Связаться с водителем</span>}
+  {showNumber ? <strong>{phoneDisplay}</strong> : phoneDisplay}
+</span>}
 <a
-  class:list={['contact-link', `contact-link--${channel}`, { 'phone-number': showNumber, 'contact-link--icon': iconOnly, 'contact-link--prominent': prominent }]}
+  class:list={['contact-link', `contact-link--${channel}`, { 'phone-number': showNumber, 'contact-link--icon': iconOnly, 'contact-link--prominent': prominent, 'mobile-phone': channel === 'phone' }]}
   href={contact.mobileHref}
   data-contact={channel}
-  data-phone={channel === "phone" ? contacts.phone : undefined}
   data-mobile-href={contact.mobileHref}
   data-desktop-href={contact.desktopHref}
   aria-label={iconOnly ? `Написать в ${contact.label}` : undefined}
 >
   {channel === 'phone' ? <Icon name="phone" size={21} /> : <img class="messenger-logo" src={localUrl(channel === 'max' ? 'images/max-logo.png' : 'images/whatsapp-logo.svg')} width="28" height="28" alt="" aria-hidden="true" />}
   <span class:list={{ 'sr-only': iconOnly }}>
-    {prominent ? <><strong class="call-number">{label}</strong><span class="call-label">Связаться с водителем</span></> : label}
+    {prominent ? <><span class="call-label">Связаться с водителем</span><strong class="call-number">{label}</strong></> : label}
   </span>
 </a>
 
 <style>
+  .desktop-phone { display: none; }
+  @media (min-width: 52rem) {
+    .desktop-phone { display: inline-flex; flex-direction: column; gap: .5rem; }
+    .mobile-phone { display: none; }
+    .desktop-phone--prominent { font-size: clamp(1.4rem, 2.8vw, 2rem); line-height: 1.4; }
+    .desktop-phone-label { font-size: clamp(1.2rem, 2.3vw, 1.65rem); font-weight: 500; letter-spacing: -.025em; }
+  }
   .messenger-logo { width: 1.75rem; height: 1.75rem; object-fit: contain; flex: none; }
   .call-number { display: block; font-size: clamp(1.1rem, 2.3vw, 1.65rem); line-height: 1.3; }
   .call-label { display: block; font-size: .85rem; font-weight: 500; letter-spacing: 0; white-space: nowrap; line-height: 1.5; }
