@@ -1,0 +1,99 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import ContactButton from '../../components/ContactButton.astro';
+import { site } from '../../data/site';
+import { formatPrice, getRoutes } from '../../lib/routes';
+import { localUrl } from '../../lib/urls';
+
+export async function getStaticPaths() {
+  return (await getRoutes()).map((route) => ({ params: { slug: route.id }, props: { route } }));
+}
+
+interface Props {
+  route: CollectionEntry<'routes'>;
+}
+
+const { title, region, description, images, priceFrom, seo } = Astro.props.route.data;
+const [cover, ...extraImages] = images;
+---
+
+<BaseLayout {...seo} image={cover}>
+  <article class="section container route-page">
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
+      <a href={localUrl()}>Главная</a>
+      <Icon name="right" size={14} />
+      <a href={localUrl('routes/')}>Направления</a>
+      <Icon name="right" size={14} />
+      <span aria-current="page">{title}</span>
+    </nav>
+    <div class="route-heading">
+      <div>
+        {region && <p class="eyebrow"><Icon name="pin" size={16} /> {region}</p>}
+        <h1>{title}</h1>
+      </div>
+      <div class="booking">
+        {priceFrom && <p><strong>{formatPrice(priceFrom)}</strong> <small>· пример цены</small></p>}
+        <ContactButton label="Забронировать поездку" />
+      </div>
+    </div>
+    <figure class="route-cover">
+      <Image {...cover} widths={[480, 720, 960, 1200, 1440]} sizes="(min-width: 80rem) 1184px, 92vw" format="webp" quality={80} priority />
+    </figure>
+    <div class="route-info">
+      <section aria-labelledby="trip-title">
+        <h2 id="trip-title">О поездке</h2>
+        <p class="lead">{description}</p>
+        <p>Можно согласовать поездку в обе стороны. Стоимость зависит от маршрута и обсуждается с водителем.</p>
+      </section>
+      <section class="pickup" aria-labelledby="pickup-title">
+        <h2 id="pickup-title">Где забираем</h2>
+        <p>Подача доступна из любого города КМВ.</p>
+        <ul>{site.departureCities.map((city) => <li>{city}</li>)}</ul>
+        <p>Другие места подачи согласовываются индивидуально.</p>
+      </section>
+    </div>
+    {extraImages.length > 0 && (
+      <div class="route-photos">
+        {extraImages.map((image) => <Image {...image} widths={[480, 720, 960]} sizes="(min-width: 48rem) 44vw, 92vw" format="webp" quality={78} />)}
+      </div>
+    )}
+    <a href={localUrl('routes/')} class="text-link"><Icon name="left" size={18} /> Все направления</a>
+  </article>
+</BaseLayout>
+
+<style>
+  .route-page { padding-top: clamp(2rem, 4vw, 4rem); }
+  .route-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    margin-bottom: 1.4rem;
+  }
+  h1 { overflow-wrap: anywhere; }
+  .booking { display: grid; gap: .45rem; }
+  .booking small { color: var(--muted); }
+  .route-cover :global(img) {
+    width: 100%;
+    height: clamp(15rem, 39vw, 32rem);
+    border-radius: var(--radius);
+    object-fit: cover;
+  }
+  .route-info, .route-photos {
+    display: grid;
+    gap: 1.35rem;
+    margin-block: clamp(1.85rem, 5vw, 4rem);
+  }
+  .route-info p { max-width: 36rem; margin-top: .75rem; color: var(--muted); }
+  .pickup { border-radius: var(--radius); background: var(--sand); padding: clamp(1.15rem, 3vw, 1.8rem); }
+  .pickup ul { margin: .65rem 0; padding-left: 1.2rem; }
+  .route-photos :global(img) { border-radius: var(--radius); }
+  @media (min-width: 48rem) {
+    .route-info { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); }
+    .route-photos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+</style>

@@ -1,0 +1,37 @@
+---
+import Icon from './Icon.astro';
+import { localUrl } from '../lib/urls';
+import { contactChannels, contacts, phoneDisplay } from '../data/contacts';
+
+interface Props {
+  channel: 'phone' | 'whatsapp' | 'max';
+  showNumber?: boolean;
+  iconOnly?: boolean;
+  prominent?: boolean;
+}
+
+const { channel, showNumber = false, iconOnly = false, prominent = false } = Astro.props;
+const contact = contactChannels.find(({ icon }) => icon === channel)!;
+const label = showNumber ? phoneDisplay : contact.label;
+---
+
+<a
+  class:list={['contact-link', `contact-link--${channel}`, { 'phone-number': showNumber, 'contact-link--icon': iconOnly, 'contact-link--prominent': prominent }]}
+  href={contact.mobileHref}
+  data-contact={channel}
+  data-phone={channel === "phone" ? contacts.phone : undefined}
+  data-mobile-href={contact.mobileHref}
+  data-desktop-href={contact.desktopHref}
+  aria-label={iconOnly ? `Написать в ${contact.label}` : undefined}
+>
+  {channel === 'phone' ? <Icon name="phone" size={21} /> : <img class="messenger-logo" src={localUrl(channel === 'max' ? 'images/max-logo.png' : 'images/whatsapp-logo.svg')} width="28" height="28" alt="" aria-hidden="true" />}
+  <span class:list={{ 'sr-only': iconOnly }}>
+    {prominent && <span class="call-label">Позвонить</span>}
+    {label}
+  </span>
+</a>
+
+<style>
+  .messenger-logo { width: 1.75rem; height: 1.75rem; object-fit: contain; flex: none; }
+  .call-label { display: block; font-size: 1.1rem; letter-spacing: 0; }
+</style>

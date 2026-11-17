@@ -1,0 +1,65 @@
+---
+import Brand from './Brand.astro';
+import { navigation } from '../data/site';
+import { indexable, localUrl } from '../lib/urls';
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-main">
+      <Brand />
+      <nav aria-label="Навигация в подвале">
+        {navigation.map(({ label, path }) => <a href={localUrl(path)}>{label}</a>)}
+      </nav>
+    </div>
+    <div class="footer-note">
+      <span>Индивидуальные трансферы по Северному Кавказу</span>
+      {!indexable && <span>Демонстрационный режим · тестовые контакты, изображения и отзывы</span>}
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: 2.15rem 1.5rem;
+    background: var(--paper);
+  }
+
+  .footer-main {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1.15rem 2rem;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 1.45rem;
+    font-size: .875rem;
+  }
+
+  nav a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--rust);
+  }
+
+  .footer-note {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: .3rem 1rem;
+    margin-top: 1.3rem;
+    padding-top: 1.2rem;
+    border-top: 1px solid var(--line);
+    font-size: .8125rem;
+    color: var(--muted);
+  }
+</style>

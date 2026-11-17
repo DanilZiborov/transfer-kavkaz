@@ -1,0 +1,18 @@
+---
+import PhotoGallery from './PhotoGallery.astro';
+import { gallery } from '../data/photography';
+---
+
+<section class="section container" aria-labelledby="gallery-title" data-reveal>
+  <div class="gallery-heading">
+    <p class="eyebrow">Фотогалерея</p>
+    <h2 id="gallery-title">Кавказ в кадре</h2>
+  </div>
+  <PhotoGallery photos={gallery} group="travel" />
+</section>
+
+<style>
+  .gallery-heading {
+    margin-bottom: clamp(1.35rem, 3vw, 2.25rem);
+  }
+</style>

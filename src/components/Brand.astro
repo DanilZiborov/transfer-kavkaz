@@ -1,0 +1,10 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { localUrl } from '../lib/urls';
+---
+
+<a class="brand" href={localUrl()} aria-label={`${site.name} — главная`}>
+  <span class="brand-mark"><Icon name="mountains" size={25} /></span>
+  <span>Transfer <strong>Kavkaz</strong></span>
+</a>

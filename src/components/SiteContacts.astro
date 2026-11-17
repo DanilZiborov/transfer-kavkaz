@@ -1,0 +1,56 @@
+---
+import ContactChannels from './ContactChannels.astro';
+---
+
+<aside class="mobile-contact" aria-label="Быстрая связь">
+  <ContactChannels variant="bar" />
+</aside>
+
+<script>
+  const mobile = matchMedia('(max-width: 51.999rem)');
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-contact]');
+
+  const updateLinks = () => {
+    links.forEach((link) => {
+      link.href = (mobile.matches ? link.dataset.mobileHref : link.dataset.desktopHref) ?? '#';
+      if (link.dataset.contact !== 'phone') {
+        link.target = mobile.matches ? '_self' : '_blank';
+        link.rel = 'noopener noreferrer';
+      }
+    });
+  };
+
+  updateLinks();
+  mobile.addEventListener('change', updateLinks);
+
+  links.forEach((link) => {
+    link.addEventListener('click', async (event) => {
+      if (link.dataset.contact !== 'phone' || mobile.matches) return;
+      const section = document.querySelector<HTMLElement>('#contacts');
+      if (!section) return;
+      event.preventDefault();
+      section.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+      const status = section.querySelector<HTMLElement>('.copy-status');
+      try {
+        await navigator.clipboard.writeText(link.dataset.phone ?? '');
+        if (status) status.textContent = 'Номер скопирован';
+      } catch {
+        if (status) status.textContent = 'Номер можно выделить и скопировать вручную';
+      }
+    });
+  });
+</script>
+
+<style>
+  .mobile-contact {
+    position: fixed;
+    z-index: 5;
+    inset: auto 0 0;
+    padding: .3rem var(--gutter) calc(.3rem + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--line);
+    background: var(--paper);
+  }
+  @media (min-width: 52rem) {
+    .mobile-contact { display: none; }
+  }
+</style>

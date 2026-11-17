@@ -1,0 +1,83 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+import { formatPrice } from '../lib/routes';
+import { routeUrl } from '../lib/urls';
+
+interface Props {
+  route: CollectionEntry<'routes'>;
+  heading: 'h2' | 'h3';
+  priority: boolean;
+}
+
+const { route, heading: Heading, priority } = Astro.props;
+const { images, title, region, priceFrom } = route.data;
+const image = images[0];
+---
+
+<li class="route-card">
+  <a href={routeUrl(route.id)}>
+    <div class="route-photo">
+      <Image {...image} width={640} widths={[320, 400, 480, 640, 900]} sizes="(min-width: 75rem) 280px, (min-width: 66rem) 22vw, (min-width: 32rem) 45vw, 92vw" format="webp" quality={77} {priority} />
+    </div>
+    <div class="route-caption">
+      <div>
+        {region && <p class="region">{region}</p>}
+        <Heading class="route-title">{title}</Heading>
+        {priceFrom && <p class="price">{formatPrice(priceFrom)} <small>· пример цены</small></p>}
+      </div>
+      <span class="card-arrow"><Icon name="diagonal" size={19} /></span>
+    </div>
+  </a>
+</li>
+
+<style>
+  a {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #fffdf8;
+    text-decoration: none;
+  }
+
+  .route-photo { overflow: hidden; background: var(--sand); }
+
+  .route-photo :global(img) {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    transition: transform .4s ease;
+  }
+
+  .route-caption {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: .4rem;
+    padding: 1rem;
+  }
+
+  .route-caption > div { min-width: 0; }
+  .region { margin-bottom: .35rem; color: var(--muted); font-size: .75rem; }
+  .route-title { font-size: var(--text-card); overflow-wrap: anywhere; }
+  .region { min-height: 3.2em; }
+  .price { margin-top: .45rem; color: var(--rust); font-size: .85rem; }
+  .price small { color: var(--muted); }
+
+  .card-arrow {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.3rem;
+    height: 2.3rem;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    transition: background-color .2s, color .2s;
+  }
+
+  a:hover .card-arrow, a:focus-visible .card-arrow { background: var(--forest); color: var(--paper); }
+  a:hover :global(img) { transform: scale(1.045); }
+</style>

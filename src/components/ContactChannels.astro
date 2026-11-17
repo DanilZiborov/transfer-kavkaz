@@ -1,0 +1,76 @@
+---
+import ContactLink from './ContactLink.astro';
+import { contactChannels } from '../data/contacts';
+
+interface Props {
+  variant: 'menu' | 'bar' | 'section' | 'header';
+}
+
+const { variant } = Astro.props;
+---
+
+<ul class:list={['channels', `channels--${variant}`]}>
+  {contactChannels.map(({ icon }) => (
+    <li><ContactLink channel={icon} iconOnly={variant === 'header' && icon !== 'phone'} showNumber={variant === 'header' && icon === 'phone'} /></li>
+  ))}
+</ul>
+
+<style>
+  .channels {
+    display: flex;
+    gap: .5rem;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+  }
+
+  .channels--menu {
+    display: grid;
+    gap: .35rem;
+  }
+
+  .channels--menu :global(.contact-link) {
+    width: 100%;
+    justify-content: start;
+    border-radius: .5rem;
+    padding-inline: .75rem;
+  }
+
+  .channels--menu :global(.contact-link:hover) {
+    background: var(--sand);
+  }
+
+  .channels--header {
+    align-items: center;
+    gap: .35rem;
+  }
+
+  .channels--bar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .2rem;
+  }
+
+  .channels--bar :global(.contact-link) {
+    flex-direction: column;
+    gap: .15rem;
+    font-size: .75rem;
+    padding: .25rem;
+    min-height: 3.15rem;
+  }
+
+  .channels--section {
+    flex-wrap: wrap;
+    gap: .65rem;
+  }
+
+  .channels--section :global(.contact-link) {
+    padding-inline: 1.15rem;
+    min-height: 3.2rem;
+    border: 1px solid #f9f5e86b;
+  }
+
+  .channels--section :global(.contact-link:hover) {
+    background: #ffffff18;
+  }
+</style>

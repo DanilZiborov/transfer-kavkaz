@@ -1,0 +1,150 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import RouteCard from './RouteCard.astro';
+import Icon from './Icon.astro';
+
+interface Props {
+  routes: CollectionEntry<'routes'>[];
+  heading?: 'h2' | 'h3';
+  prioritizeFirst?: boolean;
+  carousel?: boolean;
+}
+
+const { routes, heading = 'h3', prioritizeFirst = false, carousel = false } = Astro.props;
+---
+
+<div data-route-carousel={carousel || undefined} role={carousel ? 'region' : undefined} aria-roledescription={carousel ? 'карусель' : undefined} aria-label={carousel ? 'Популярные направления' : undefined}>
+<ul class:list={['route-grid', { 'route-grid--carousel': carousel }]} tabindex={carousel ? '0' : undefined} aria-label={carousel ? 'Листайте направления стрелками или свайпом' : undefined}>
+  {routes.map((route, index) => <RouteCard {route} {heading} priority={prioritizeFirst && index === 0} />)}
+</ul>
+{carousel && <div class="carousel-controls" hidden>
+  <button class="carousel-button" type="button" data-prev aria-label="Предыдущие направления"><Icon name="left" /> Назад</button>
+  <button class="carousel-button" type="button" data-next aria-label="Следующие направления">Далее <Icon name="right" /></button>
+</div>}
+</div>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-route-carousel]').forEach((carousel) => {
+    const track = carousel.querySelector<HTMLElement>('.route-grid');
+    const previous = carousel.querySelector<HTMLButtonElement>('[data-prev]');
+    const next = carousel.querySelector<HTMLButtonElement>('[data-next]');
+    const controls = carousel.querySelector<HTMLElement>('.carousel-controls');
+    if (!track || !previous || !next || !controls) return;
+
+    const cards = Array.from(track.children);
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => {
+      previous.disabled = track.scrollLeft < 2;
+      next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+
+    };
+
+    const move = (direction: number) => {
+      const card = cards[0]?.getBoundingClientRect();
+      if (!card) return;
+      const gap = parseFloat(getComputedStyle(track).columnGap);
+      const step = (card.width + gap) * Math.max(1, Math.floor((track.clientWidth + gap) / (card.width + gap)));
+      track.scrollBy({ left: step * direction, behavior: reducedMotion.matches ? 'instant' : 'smooth' });
+    };
+
+    previous.addEventListener('click', () => move(-1));
+    next.addEventListener('click', () => move(1));
+    track.addEventListener('keydown', (event) => {
+      if (event.target !== track || (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight')) return;
+      event.preventDefault();
+      move(event.key === 'ArrowLeft' ? -1 : 1);
+    });
+    track.addEventListener('scroll', update, { passive: true });
+    new ResizeObserver(update).observe(track);
+    controls.hidden = false;
+    update();
+  });
+</script>
+
+<style>
+  .route-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 32rem) {
+    .route-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+  }
+
+  @media (min-width: 66rem) {
+    .route-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+  }
+
+  .route-grid--carousel {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+    padding: .35rem .2rem .85rem;
+    scroll-padding-inline: .2rem;
+    overscroll-behavior-x: contain;
+  }
+
+  .route-grid--carousel :global(.route-card) {
+    flex: 0 0 88%;
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: end;
+    gap: .6rem;
+    margin-top: .7rem;
+  }
+
+  .carousel-controls[hidden] {
+    display: none;
+  }
+
+  .carousel-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .65rem;
+    min-height: 3.25rem;
+    padding: .7rem 1.3rem;
+    border: 1px solid var(--forest);
+    border-radius: 2rem;
+    background: var(--forest);
+    color: var(--paper);
+    font-weight: 650;
+  }
+  .carousel-button:hover { background: #385242; }
+
+  .carousel-button:disabled {
+    opacity: .4;
+    cursor: default;
+  }
+
+  @media (min-width: 32rem) {
+    .route-grid--carousel :global(.route-card) {
+      flex-basis: calc((100% - 1rem) / 2);
+    }
+
+  }
+
+  @media (min-width: 66rem) {
+    .route-grid--carousel :global(.route-card) {
+      flex-basis: calc((100% - 3rem) / 4);
+    }
+
+  }
+</style>

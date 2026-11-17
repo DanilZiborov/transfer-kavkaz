@@ -5,4 +5,5 @@ export default defineConfig({
   base: '/transfer-kavkaz/',
   trailingSlash: 'always',
   output: 'static',
+  server: { host: '127.0.0.1' },
 });

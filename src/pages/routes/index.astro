@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../../components/Icon.astro';
+import RouteGrid from '../../components/RouteGrid.astro';
+import ContactButton from '../../components/ContactButton.astro';
+import { getRoutes } from '../../lib/routes';
+import { localUrl } from '../../lib/urls';
+
+const routes = await getRoutes();
+const title = 'Направления трансферов из КМВ | Transfer Kavkaz';
+const description = 'Каталог направлений индивидуальных трансферов из городов КМВ по Северному Кавказу. Архыз, Домбай, Приэльбрусье, Северная Осетия и другие места.';
+---
+
+<BaseLayout {title} {description}>
+  <section class="section container catalog" aria-labelledby="catalog-title">
+    <nav class="breadcrumbs" aria-label="Хлебные крошки">
+      <a href={localUrl()}>Главная</a>
+      <Icon name="right" size={14} />
+      <span aria-current="page">Направления</span>
+    </nav>
+    <h1 id="catalog-title">Направления трансферов</h1>
+    <p class="lead">Поездки из любого города КМВ по Северному Кавказу. Место подачи, адрес назначения и обратный трансфер согласовываются заранее.</p>
+    <RouteGrid routes={routes} heading="h2" prioritizeFirst />
+    <div class="catalog-contact">
+      <div>
+        <h2>Другое направление</h2>
+        <p>Можем согласовать поездку по вашему маршруту.</p>
+      </div>
+      <ContactButton label="Забронировать поездку" />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .catalog { padding-top: clamp(2rem, 4vw, 4rem); }
+  h1 { max-width: 18ch; overflow-wrap: anywhere; }
+  .lead { margin-top: 1rem; }
+  .catalog :global(.route-grid) { margin-top: clamp(1.75rem, 4vw, 3.25rem); }
+  .catalog-contact {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem 2rem;
+    margin-top: clamp(2rem, 5vw, 4.5rem);
+    padding: clamp(1.25rem, 4vw, 2.75rem);
+    border-radius: var(--radius);
+    background: var(--sand);
+  }
+  .catalog-contact p { margin-top: .5rem; color: var(--muted); }
+</style>

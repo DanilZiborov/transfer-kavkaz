@@ -1,0 +1,16 @@
+---
+import Icon from './Icon.astro';
+import { localUrl } from '../lib/urls';
+
+interface Props {
+  label: string;
+  variant?: 'accent' | 'dark' | 'outline';
+}
+
+const { label, variant = 'dark' } = Astro.props;
+---
+
+<a href={localUrl("#contacts")} class:list={['button', `button--${variant}`]}>
+  {label}
+  <Icon name={variant === 'outline' ? 'chevron' : 'diagonal'} size={17} />
+</a>

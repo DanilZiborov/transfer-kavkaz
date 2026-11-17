@@ -7,6 +7,7 @@ const routes = defineCollection({
   schema: ({ image }) => z.object({
     id: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
     title: z.string().trim().min(1),
+    region: z.string().trim().min(1).optional(),
     description: z.string().trim().min(1),
     images: z.array(z.object({
       src: image(),

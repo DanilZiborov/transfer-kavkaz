@@ -1,31 +1,53 @@
 ---
 import '../styles/global.css';
+import { getImage } from 'astro:assets';
+import { heroPhoto } from '../data/photography';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteContacts from '../components/SiteContacts.astro';
+import { site } from '../data/site';
+import { indexable, localUrl } from '../lib/urls';
 
 interface Props {
   title: string;
   description: string;
+  image?: { src: ImageMetadata; alt: string };
 }
 
-const { title, description } = Astro.props;
+const {
+  title,
+  description,
+  image = heroPhoto,
+} = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
-const indexable = import.meta.env.SITE_INDEXABLE === 'true';
+const socialImage = await getImage({ src: image.src, width: 1200, height: 630, fit: 'cover', format: 'jpeg', quality: 80 });
 ---
 
 <!doctype html>
 <html lang="ru">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#faf8f2" />
     <title>{title}</title>
     <meta name="description" content={description} />
     {!indexable && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
+    <link rel="icon" type="image/svg+xml" href={localUrl('favicon.svg')} />
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:locale" content="ru_RU" />
+    <meta property="og:image" content={new URL(socialImage.src, Astro.site)} />
+    <meta property="og:image:alt" content={image.alt} />
   </head>
   <body>
-    <slot />
+    <a class="skip-link" href="#main-content">К содержанию</a>
+    <SiteHeader />
+    <main id="main-content" tabindex="-1"><slot /></main>
+    <SiteFooter />
+    <SiteContacts />
   </body>
 </html>
